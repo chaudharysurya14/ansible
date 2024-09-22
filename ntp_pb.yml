@@ -1,0 +1,64 @@
+---
+- name: Check NTP service status
+  hosts: all
+  gather_facts: true
+  become: yes
+  become_user: root
+#  ask_become_pass: 0000
+  tasks:
+    - name: Ensure ntp is installed
+      package:
+        name: chronyd
+        state: present
+      ignore_errors: true
+
+    - name: Check if NTP is running
+      systemd:
+        name: chronyd
+        state: started
+      register: ntp_service_status
+      ignore_errors: false
+
+    - name: If NTP service is enabled
+      systemd: 
+        name: chronyd
+        enabled: yes
+      register: ntp_service_enabled
+      ignore_errors: true
+
+    - name: Check Chrony synchronization status
+      command: chronyc tracking
+      register: chrony_status
+      ignore_errors: yes
+
+    - name: Display Chrony synchronization status
+      debug:
+        msg: "{{ chrony_status.stdout }}"
+      when: chrony_status.rc == 0
+
+    - name: Fail if Chrony is not synchronized
+      fail:
+        msg: "Chrony is not synchronized on {{ inventory_hostname }}. Output: {{ chrony_status.stdout }}"
+      when: chrony_status.stdout is search('^Reference ID:\s+0.0.0.0')
+
+    - name: Fail if chronyc command failed
+      fail:
+        msg: "Failed to retrieve Chrony status from {{ inventory_hostname }}. Output: {{ chrony_status.stderr }}"
+      when: chrony_status.rc != 0
+
+    - name: Display NTP service status
+      debug:
+        msg: >
+          NTP Service Status:
+          Running: {{ ntp_service_status is defined and ntp_service_status.status is defined and ntp_service_status.status.ActiveState == 'active' }}
+          Enabled: {{ ntp_service_enabled is defined and ntp_service_enabled.enabled }}
+      when: ntp_service_status is defined or ntp_service_enabled is defined
+
+    - name: Fail if NTP service is not running or enabled
+      fail:
+        msg: "NTP service is not running or not enabled on {{ inventory_hostname }}"
+      when: not (ntp_service_status is defined and ntp_service_status.status.ActiveState == 'active') or not (ntp_service_enabled is defined and ntp_service_enabled.enabled)
+
+
+
+# command for run this : ansible-playbook ntp_pb.yml --ask-become-pass

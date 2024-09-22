@@ -21,14 +21,3 @@
       register: ssh_result
 
 
-
-
-
-
-
-
-
-
-#      command: df -Th
-#      command: cal
-#      command: timedatectl
