@@ -1,0 +1,34 @@
+---
+- name: Check server status
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Pinging to server
+      ping:
+      register: ping_result
+
+    - name: Display ping result
+      debug:
+        msg: "Server is up and Responding"
+      when: ping_result.ping is defined
+
+    - name: Check SSH connectivity
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        timeout: 5
+        state: started
+      register: ssh_result
+
+
+
+
+
+
+
+
+
+
+#      command: df -Th
+#      command: cal
+#      command: timedatectl
