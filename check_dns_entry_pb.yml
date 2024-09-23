@@ -1,0 +1,22 @@
+---
+- name: Check DNS Entry
+  hosts: localhost
+  gather_facts: no
+  vars:
+    domain: "example.com"  # Change this to the domain you want to check
+    dns_server: "8.8.8.8"  # Optional: Specify a DNS server
+
+  tasks:
+    - name: Check DNS entry using dig
+      command: dig @{{ dns_server }} {{ domain }} +short
+      register: dns_check
+      ignore_errors: yes
+
+    - name: Display DNS entry result
+      debug:
+        msg: >
+          {% if dns_check.stdout %}
+            DNS entry for {{ domain }} exists: {{ dns_check.stdout }}
+          {% else %}
+            DNS entry for {{ domain }} does not exist.
+          {% endif %}
