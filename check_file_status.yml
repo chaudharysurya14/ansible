@@ -1,0 +1,26 @@
+---
+- name: Check directory is exist or not
+  hosts: all
+  gather_facts: false
+#  become: true
+  vars: 
+    directory_path: /home/surya/surya/ansible_client/playbooks
+  
+  tasks:
+    - name: Check if the directory exist
+      ansible.builtin.stat:
+        path: "{{ directory_path }}"
+      register: dir_stat
+      ignore_errors: true
+
+    - name: Report on directory exist
+      debug:
+        msg: "The directory '{{ directory_path }}' exists."
+      when: dir_stat.stat.exists
+      ignore_errors: true
+
+    - name: Report on directory exist
+      debug:
+        msg: "The directory '{{ directory_path }}' does not exist."
+      when: not dir_stat.stat.exists
+      ignore_errors: true
