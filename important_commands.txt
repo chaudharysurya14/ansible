@@ -1,0 +1,13 @@
+# command for run this : ansible-playbook ntp_pb.yml --ask-become-pass
+# command for skip fingerprint verification: ansible-playbook ntp_pb.yml --ask-become-pass --ssh-extra-args='-o StrictHostKeyChecking=no'
+# Execute ad-hoc commands without writing a playbook. For example, to ping all hosts: ansible all -i inventory_file -m ping
+# To gather system information (facts) from hosts: ansible all -i inventory_file -m setup
+# To check the connectivity to all hosts: ansible all -i inventory_file -m ping
+# Run a specific module on a specific host or group: ansible webservers -i inventory_file -m service -a "name=httpd state=started"
+# To run a playbook with extra variables: ansible-playbook -i inventory_file playbook.yml -e "variable_name=value"
+# To run a playbook only on specific hosts: ansible-playbook -i inventory_file playbook.yml --limit host1
+# To simulate a playbook run without making changes: ansible-playbook -i inventory_file playbook.yml --check
+# To increase the verbosity of output for debugging:
+	: ansible-playbook -i inventory_file playbook.yml -v  # Use -vv or -vvv for more verbosity
+
+## To run playbooks in the background without blocking your terminal: nohup ansible-playbook -i inventory_file playbook.yml &

@@ -1,0 +1,3 @@
+# command for run this : ansible-playbook ntp_pb.yml --ask-become-pass
+# command for skip fingerprint verification: ansible-playbook ntp_pb.yml --ask-become-pass --ssh-extra-args='-o StrictHostKeyChecking=no'
+# Execute ad-hoc commands without writing a playbook. For example, to ping all hosts: 

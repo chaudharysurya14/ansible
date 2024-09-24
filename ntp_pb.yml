@@ -60,5 +60,3 @@
       when: not (ntp_service_status is defined and ntp_service_status.status.ActiveState == 'active') or not (ntp_service_enabled is defined and ntp_service_enabled.enabled)
 
 
-
-# command for run this : ansible-playbook ntp_pb.yml --ask-become-pass
