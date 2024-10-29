@@ -1,0 +1,12 @@
+ansible-playbook/
+├── playbooks/
+│   ├── site.yml
+│   └── webserver.yml
+├── roles/
+│   ├── common/
+│   ├── webserver/
+│   └── database/
+├── inventory/
+│   └── hosts
+└── group_vars/
+    └── all.yml
