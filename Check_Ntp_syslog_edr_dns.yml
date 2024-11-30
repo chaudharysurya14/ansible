@@ -1,0 +1,82 @@
+---
+- name: Checklist of plateform services
+  hosts: all
+  become: yes
+  gather_facts: true
+  tasks:
+    - name: Ensure chrony is installed
+      package:
+        name: chrony
+        state: present
+      ignore_errors: yes
+
+    - name: Check if NTP service is running
+      systemd:
+        name: chronyd
+        state: started
+        enabled: yes
+      register: ntp_status
+      ignore_errors: yes
+
+    - name: Check the status of the NTP service
+      shell: timedatectl | grep synchronized
+      register: ntp_service_status
+      changed_when: no
+      failed_when: false
+
+    - name: Display NTP synchronized status
+      debug:
+        msg:
+          NTP Service Status:{{ ntp_service_status.stdout }}
+
+
+#---------------syslog--------------------------------------
+    - name: Ensure syslog service is installed
+      package:
+        name: rsyslog
+        state: present
+
+    - name: Check if syslog service is running
+      systemd:
+        name: rsyslog
+        state: started
+        enabled: yes
+      register: syslog_status
+      ignore_errors: yes
+
+    - name: Checking current syslog entries
+#      command: journalctl -u rsyslog --since "1 hour ago"
+      shell: tail -4 /etc/rsyslog.conf
+      register: recent_syslog_entries
+      changed_when: no
+
+    - name: Display syslog entries
+      debug:
+        msg: |
+          Current Syslog Entry is:{{ recent_syslog_entries.stdout }}
+
+#-------------------------------------------dns----------------------
+    - name: Checking DNS entry in the file
+      shell: cat /etc/resolv.conf | grep nameserver
+      register: show_dns_entry
+      ignore_errors: yes
+
+    - name: Display file entry
+      debug:
+        msg: "The content is: {{show_dns_entry.stdout}}"
+      ignore_errors: yes
+
+#----------------EDR-----------------------------------------------------
+    - name: Check EDR service status
+      shell: systemctl status elastic-agent | grep Active
+      register: edr_agent_status
+      changed_when: no
+      ignore_errors: yes
+
+    - name: Display EDR service status
+      debug:
+        msg:
+          Elastic-agent is:{{edr_agent_status.stdout}}
+
+# docker run --name iredmail --env-file iredmail-docker.conf --hostname webmail.ng.in -p 80:80 -p 443:443 -p 110:110 -p 995:995 -p 143:143 -p 993:993 -p 25:25 -p 465:465 -p 587:587 -v /iredmail/data/backup-mysql:/var/vmail/backup/mysql -v /iredmail/data/mailboxes:/var/vmail/vmail1 -v /iredmail/data/mlmmj:/var/vmail/mlmmj -v /iredmail/data/mlmmj-archive/:/var/vmail/mlmmj-archive -v /iredmail/data/imapsieve_copy/:/var/vmail/vmail1/imapsieve_copy -v /iredmail/data/custom:/opt/iredmail/custom -v /iredmail/data/ssl:/opt/iredmail/ssl -v /iredmail/data/mysql:/var/lib/mysql -v /iredmail/data/clamav:/var/lib/clamav -v /iredmail/data/sa_rules:/var/lib/spamassassin -v /iredmail/data/postfix_queue:/var/spool/postfix iredmail/mariadb:stable
+
